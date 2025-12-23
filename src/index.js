@@ -27,6 +27,36 @@ app.use("/api/books", bookRoutes);
 //   connectDB();
 // });
 
+// Cron Job Endpoint
+// Buka file src/index.js
+// Masukkan kode ini setelah app.use(cors())
+
+app.get("/api/cron", (req, res) => {
+  try {
+    // 1. Ambil Header Authorization
+    const authHeader = req.headers["authorization"];
+
+    // 2. Validasi dengan Secret dari Environment Variables
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      console.error("Gagal: Secret tidak cocok!");
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    // 3. Logika yang ingin dijalankan
+    console.log("Cron Job manual run triggered! Server tetap aktif.");
+
+    res.status(200).json({
+      success: true,
+      message: "Keep-alive successful",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Cron Crash Error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+// End cron
+
 // Root endpoint (opsional agar saat buka domain tidak muncul 'Cannot GET /')
 app.get("/", (req, res) => {
   res.send("Backend RekamBuku API is running...");
