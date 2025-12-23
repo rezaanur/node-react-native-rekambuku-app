@@ -16,12 +16,6 @@ app.use(cors());
 // Jalankan koneksi database di luar listen agar lebih stabil di serverless
 connectDB();
 
-// Endpoint Cron Job untuk menjaga server tetap aktif
-app.get("/api/cron", (req, res) => {
-  console.log("Cron Job manual run triggered!");
-  res.status(200).json({ success: true, message: "Keep-alive successful" });
-});
-
 // Endpoint Authentication
 app.use("/api/auth", authRoutes);
 
@@ -36,6 +30,11 @@ app.use("/api/books", bookRoutes);
 // Root endpoint (opsional agar saat buka domain tidak muncul 'Cannot GET /')
 app.get("/", (req, res) => {
   res.send("Backend RekamBuku API is running...");
+});
+// Endpoint Cron Job untuk menjaga server tetap aktif
+app.get("/api/cron", (req, res) => {
+  console.log("Cron Job manual run triggered!");
+  res.status(200).json({ success: true, message: "Keep-alive successful" });
 });
 
 if (process.env.NODE_ENV !== "production") {
