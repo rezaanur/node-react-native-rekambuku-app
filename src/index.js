@@ -33,9 +33,23 @@ app.get("/", (req, res) => {
 });
 // Endpoint Cron Job untuk menjaga server tetap aktif
 app.get("/api/cron", (req, res) => {
-  console.log("Cron Job manual run triggered!");
-  res.status(200).json({ success: true, message: "Keep-alive successful" });
+  // Validasi keamanan menggunakan Header Authorization
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    console.error("Percobaan akses Cron ilegal!");
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  console.log("Cron Job Berhasil: Server tetap aktif pada " + new Date().toISOString());
+
+  res.status(200).json({
+    success: true,
+    message: "Server is awake!",
+    timestamp: new Date().toISOString(),
+  });
 });
+// selesai cron job
 
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
