@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "/api/cron",
-      "dest": "src/index.js"
+      "dest": "src/lib/cron.js"
     },
     {
       "src": "/(.*)",
