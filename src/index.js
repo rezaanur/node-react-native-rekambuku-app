@@ -18,12 +18,15 @@ connectDB();
 
 // Endpoint Cron Job untuk menjaga server tetap aktif
 app.get("/api/cron", (req, res) => {
-  console.log("Cron Job executed: Server is being kept awake");
-  res.status(200).json({
-    success: true,
-    message: "Keep-alive successful",
-    timestamp: new Date().toISOString(),
-  });
+  // Vercel mengirimkan header Authorization secara otomatis
+  const authHeader = req.headers["authorization"];
+
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  console.log("Tugas otomatis (Keep-alive) dijalankan!");
+  res.status(200).json({ success: true, message: "Server is awake" });
 });
 
 // Endpoint Authentication
