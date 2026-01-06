@@ -110,4 +110,34 @@ router.delete("/:id", protectRoute, async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+// Update book
+// Route untuk Edit Buku
+router.put("/:id", protectRoute, async (req, res) => {
+  try {
+    const { title, caption, rating, image } = req.body;
+    const book = await Book.findById(req.params.id);
+
+    if (!book) return res.status(404).json({ message: "Book Undifined" });
+
+    // Validasi pemilik buku
+    if (book.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "You are not authorized to edit this book" });
+    }
+
+    let imageUrl = book.image;
+    // Jika ada gambar baru dalam format Base64
+    if (image && image.startsWith("data:image")) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      imageUrl = uploadResponse.secure_url;
+    }
+
+    const updatedBook = await Book.findByIdAndUpdate(req.params.id, { title, caption, rating, image: imageUrl }, { new: true });
+
+    res.json(updatedBook);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+// End UpdateBook
 export default router;
